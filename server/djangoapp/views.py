@@ -88,6 +88,7 @@ def registration_request(request):
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://kevinraguett-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+        
         # Get dealers from the URL
         context = {
             "dealerships": get_dealers_from_cf(url),
@@ -105,11 +106,13 @@ def get_dealer_details(request, id):
 
          review_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
          reviews = get_dealer_reviews_from_cf(review_url, id = id)
+         print("reviews :",reviews)
          context["reviews"] = reviews
 
          return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
+
 @login_required
 def add_review(request, id):
     context = {}
@@ -149,7 +152,7 @@ def add_review(request, id):
             
             # Prepare payload for the API request
             new_payload = {"review": payload}
-            review_post_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
+            review_post_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
             
             # Make the POST request
             post_request(review_post_url, new_payload, id=id)
@@ -158,5 +161,6 @@ def add_review(request, id):
         else:
             # Handle the case where the user is not authenticated
             messages.error(request, "Please log in to add a review !!")
-            return redirect("djangoapp:login")
+            return render(request, 'djangoapp/index.html')
+
 

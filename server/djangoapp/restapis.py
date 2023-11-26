@@ -40,16 +40,38 @@ def get_request(url, **kwargs):
 def post_request(url, json_payload, **kwargs):
     print("Payload: ", json_payload, ". Params: ", kwargs)
     print(f"POST {url}")
+
     try:
-        response = requests.post(url, headers={'Content-Type': 'application/json'},
-                                 json=json_payload, params=kwargs)
-    except:
-        # If any error occurs
-        print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
-    json_data = json.loads(response.text)
-    return json_data
+        # Include id from kwargs in the JSON payload if provided
+        if 'id' in kwargs:
+            json_payload['id'] = kwargs['id']
+
+        # Use the 'with' statement to ensure proper closing of the connection
+        with requests.post(url, headers={'Content-Type': 'application/json'},
+                           json=json_payload) as response:
+            # Ensure the request was successful before attempting to load the JSON
+            print("response:", response.text)
+            response.raise_for_status()
+
+            # Get the status of the response
+            status_code = response.status_code
+            print(f"With status {status_code}")
+
+            # Load the JSON response
+            json_data = response.json()
+            print(json_data)
+
+            return json_data
+
+    except requests.exceptions.RequestException as e:
+        # Handle exceptions related to network requests
+        print(f"Network exception occurred: {e}")
+
+    except json.JSONDecodeError as e:
+        # Handle exceptions related to JSON decoding
+        print(f"JSON decoding error occurred: {e}")
+
+    return None  # In case of an error, return None or an appropriate value based on your specific needs
 
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -89,9 +111,11 @@ def get_dealer_by_id_from_cf(url, id, **kwargs):
     json_result = get_request(url, id=id)
     if json_result:
         # Get the row list in JSON as dealers
-        dealers = json_result  
+        dealers = json_result
+        #print("dealers :",dealers)  
         # For each dealer object
         dealer = dealers[0]
+        print("dealer :",dealer)
         # Create a CarDealer object with values in `doc` object
         dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
                                 id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
