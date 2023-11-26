@@ -1,6 +1,6 @@
 from cloudant.client import Cloudant
 from cloudant.query import Query
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 import atexit
 import os
 
