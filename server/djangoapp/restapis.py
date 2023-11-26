@@ -31,47 +31,45 @@ def get_request(url, **kwargs):
         json_data = response.json()
         return json_data
     except json.JSONDecodeError as e:
-        # Handle the exception and log or print an error message
         print(f"Error in get_request: {e}")
         return None
 
 
 # Create a `post_request` to make HTTP POST requests
 def post_request(url, json_payload, **kwargs):
+    print(kwargs)
     print("Payload: ", json_payload, ". Params: ", kwargs)
-    print(f"POST {url}")
-
+    print("POST to {} ".format(url))
+    apikey = kwargs.get("apikey")
+    dealer_id = kwargs.get("id")
+    
     try:
-        # Include id from kwargs in the JSON payload if provided
-        if 'id' in kwargs:
-            json_payload['id'] = kwargs['id']
-
-        # Use the 'with' statement to ensure proper closing of the connection
-        with requests.post(url, headers={'Content-Type': 'application/json'},
-                           json=json_payload) as response:
-            # Ensure the request was successful before attempting to load the JSON
-            print("response:", response.text)
-            response.raise_for_status()
-
-            # Get the status of the response
-            status_code = response.status_code
-            print(f"With status {status_code}")
-
-            # Load the JSON response
-            json_data = response.json()
-            print(json_data)
-
-            return json_data
-
-    except requests.exceptions.RequestException as e:
-        # Handle exceptions related to network requests
-        print(f"Network exception occurred: {e}")
-
+        if apikey:
+            params = dict()
+            params["text"] = kwargs.get("text")
+            params["version"] = kwargs.get("version")
+            params["features"] = kwargs.get("features")
+            params["return_analyzed_text"] = kwargs.get("return_analyzed_text")
+            
+            # Ajoutez l'id directement à l'URL
+            response = requests.post(url + f"?id={dealer_id}", json=json_payload, data=params, auth=HTTPBasicAuth('apikey', apikey), headers={'Content-Type': 'application/json'})
+        else:
+            # Call post method of requests library with URL, JSON payload, and parameters
+            params = kwargs.copy()
+            params.pop("id", None)
+            
+            # Ajoutez l'id directement à l'URL
+            response = requests.post(url + f"?id={dealer_id}", json=json_payload, headers={'Content-Type': 'application/json'}, params=params)
+        
+        # Check if the response contains valid JSON
+        response.raise_for_status()  # This will raise an exception if the response status code is an HTTP error.
+        status_code = response.status_code
+        print(f"With status {status_code}")
+        json_data = response.json()
+        return json_data
     except json.JSONDecodeError as e:
-        # Handle exceptions related to JSON decoding
-        print(f"JSON decoding error occurred: {e}")
-
-    return None  # In case of an error, return None or an appropriate value based on your specific needs
+        print(f"Error in post_request: {e}")
+        return None
 
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -188,6 +186,3 @@ def analyze_review_sentiments(dealer_review):
         # Handle any exceptions that may occur
         print(f"Error in analyze_review_sentiments: {e}")
         return None
-
-
-

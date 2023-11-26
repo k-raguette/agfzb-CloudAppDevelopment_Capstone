@@ -15,9 +15,6 @@ from django.contrib.auth.decorators import login_required
 logger = logging.getLogger(__name__)
 
 
-# Create your views here.
-
-
 # Create an `about` view to render a static about page
 def about(request):
     context = {}
@@ -112,7 +109,6 @@ def get_dealer_details(request, id):
          return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
-
 @login_required
 def add_review(request, id):
     context = {}
@@ -162,5 +158,3 @@ def add_review(request, id):
             # Handle the case where the user is not authenticated
             messages.error(request, "Please log in to add a review !!")
             return render(request, 'djangoapp/index.html')
-
-
