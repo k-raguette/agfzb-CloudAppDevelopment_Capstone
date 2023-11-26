@@ -50,15 +50,6 @@ def get_reviews():
     # Return the data as JSON
     return jsonify(data_list)
 
-def deep_get(dictionary, keys, default=None):
-    keys = keys.split('.') if isinstance(keys, str) else keys
-    for key in keys:
-        if isinstance(dictionary, dict):
-            dictionary = dictionary.get(key, default)
-        else:
-            return default
-    return dictionary
-
 @app.route('/api/post_review', methods=['POST'])
 def post_review():
     if not request.json:
