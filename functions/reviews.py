@@ -3,7 +3,6 @@ from cloudant.query import Query
 from flask import Flask, jsonify, request, abort
 import atexit
 import os
-import json
 
 #Add your Cloudant service credentials here
 cloudant_username = os.environ.get("CLOUDANT_USERNAME") #export CLOUDANT_USERNAME="your Cloudant Username"
