@@ -103,7 +103,6 @@ def get_dealer_details(request, id):
 
          review_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
          reviews = get_dealer_reviews_from_cf(review_url, id = id)
-         print("reviews :",reviews)
          context["reviews"] = reviews
 
          return render(request, 'djangoapp/dealer_details.html', context)

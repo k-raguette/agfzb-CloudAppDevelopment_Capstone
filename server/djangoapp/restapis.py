@@ -38,7 +38,7 @@ def get_request(url, **kwargs):
 # Create a `post_request` to make HTTP POST requests
 def post_request(url, json_payload, **kwargs):
     print(kwargs)
-    print("Payload: ", json_payload, ". Params: ", kwargs)
+    #print("Payload: ", json_payload, ". Params: ", kwargs)
     print("POST to {} ".format(url))
     apikey = kwargs.get("apikey")
     dealer_id = kwargs.get("id")
@@ -51,14 +51,12 @@ def post_request(url, json_payload, **kwargs):
             params["features"] = kwargs.get("features")
             params["return_analyzed_text"] = kwargs.get("return_analyzed_text")
             
-            # Ajoutez l'id directement à l'URL
             response = requests.post(url + f"?id={dealer_id}", json=json_payload, data=params, auth=HTTPBasicAuth('apikey', apikey), headers={'Content-Type': 'application/json'})
         else:
             # Call post method of requests library with URL, JSON payload, and parameters
             params = kwargs.copy()
             params.pop("id", None)
             
-            # Ajoutez l'id directement à l'URL
             response = requests.post(url + f"?id={dealer_id}", json=json_payload, headers={'Content-Type': 'application/json'}, params=params)
         
         # Check if the response contains valid JSON
