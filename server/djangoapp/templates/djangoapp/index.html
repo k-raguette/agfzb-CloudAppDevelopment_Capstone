@@ -44,7 +44,7 @@
             </ul>    
         </div>
     </nav>
-
+    <div class="container-fluid">
     <!--Add a dealer table here -->
     <table class="table" id="table" data-filter-control="true">
         <thead>
@@ -70,12 +70,22 @@
             {% endfor %}
         </tbody>
     </table>
-
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
     </body>
 
     <script>
         $(function() {
-            $('#table').bootstrapTable();
+            $('#table').bootstrapTable({
+        pagination: true,
+        pageSize: 10,
+        pageList: [10, 20, 30, 40, 50],
+        filterControl: true
+    });
         })
     </script>
 

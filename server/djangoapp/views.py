@@ -108,7 +108,7 @@ def get_dealer_details(request, id):
          return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
-@login_required
+@login_required(login_url='login/')
 def add_review(request, id):
     context = {}
     dealer_url = "https://kevinraguett-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
@@ -124,6 +124,7 @@ def add_review(request, id):
         return render(request, 'djangoapp/add_review.html', context)
     
     elif request.method == 'POST':
+        print("Vue atteinte. Utilisateur authentifié :", request.user.is_authenticated)
         if request.user.is_authenticated:
             username = request.user.username
             car_id = request.POST.get("car")
@@ -156,4 +157,5 @@ def add_review(request, id):
         else:
             # Handle the case where the user is not authenticated
             messages.error(request, "Please log in to add a review !!")
-            return render(request, 'djangoapp/index.html')
+            print("Redirection vers la page de connexion.")
+            return render(request, 'djangoapp/index.html', context)
