@@ -84,7 +84,7 @@ def registration_request(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
-        url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+        url = "http://localhost:3000/dealerships/get"
         
         # Get dealers from the URL
         context = {
@@ -97,11 +97,11 @@ def get_dealerships(request):
 def get_dealer_details(request, id):
      if request.method == "GET":
          context = {}
-         dealer_url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+         dealer_url = "http://localhost:3000/dealerships/get"
          dealer = get_dealer_by_id_from_cf(dealer_url, id = id)
          context['dealer'] = dealer
 
-         review_url = "https://kevinraguett-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
+         review_url = "http://localhost:5000/api/get_reviews"
          reviews = get_dealer_reviews_from_cf(review_url, id = id)
          context["reviews"] = reviews
          if not context["reviews"] :
@@ -111,7 +111,7 @@ def get_dealer_details(request, id):
 # Create a `add_review` view to submit a review
 def add_review(request, id):
     context = {}
-    dealer_url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+    dealer_url = "http://localhost:3000/dealerships/get"
     
     # Get dealer information
     dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
@@ -147,7 +147,7 @@ def add_review(request, id):
             
             # Prepare payload for the API request
             new_payload = {"review": payload}
-            review_post_url = "https://kevinraguett-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+            review_post_url = "http://localhost:5000/api/post_review"
             
             # Make the POST request
             post_request(review_post_url, new_payload, id=id)
