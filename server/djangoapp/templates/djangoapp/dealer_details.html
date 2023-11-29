@@ -40,13 +40,7 @@
         </nav>
 
     <!-- Add reviews as cards -->
-    <div class="container-fluid">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-warning" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    
+    <div class="container-fluid">    
         <h3>Reviews for <b>{{dealer.full_name}}</b></h3>
     
         <div class="container">
@@ -77,7 +71,11 @@
             </div>
         </div>
     </div>
-
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
     </body>
 
 </html>

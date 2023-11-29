@@ -8,8 +8,6 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
-import json
-from django.contrib.auth.decorators import login_required
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -34,17 +32,17 @@ def login_request(request):
     if request.method == "POST":
         # pull from dictionary
         username = request.POST['username']
-        password = request.POST['psw']
+        password = request.POST['psw']       
         # check auth
-        user = authenticate(username=username, password=password) 
+        user = authenticate(username=username, password=password)        
         if user is not None:
             # login if valid
             login(request, user)
-            return render(request, 'djangoapp/index.html', context)
+            return redirect('djangoapp:index')
         else:
-            return render(request, 'djangoapp/index.html', context)
-    else:
-        return render(request, 'djangoapp/index.html', context)
+            messages.warning(request, "Incorrect username or password, please try again !!")
+    # if request method is not POST or authentication failed, stay on the same page
+    return redirect('djangoapp:index')
 
 # Create a `logout_request` view to handle sign out request
 def logout_request(request):
@@ -52,8 +50,9 @@ def logout_request(request):
     # get user from session id
     print("Log out the user `{}`".format(request.user.username))
     logout(request)
+    messages.success(request, "You have been successfully logged out !!")
     # redirect back to the index.html
-    return render(request, 'djangoapp/index.html', context)
+    return redirect('djangoapp:index')
 
 # Create a `registration_request` view to handle sign up request
 def registration_request(request):
@@ -77,14 +76,15 @@ def registration_request(request):
             # create new user
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, password=password)
             login(request, user)
-            return render(request, 'djangoapp/index.html', context)
+            return render(request, 'djangoapp:index', context)
         else:
-            return render(request, 'djangoapp/index.html', context)
+            messages.warning("This user already exists !!!") 
+            return render(request, 'djangoapp:registration', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
-        url = "https://kevinraguett-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+        url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
         
         # Get dealers from the URL
         context = {
@@ -97,21 +97,21 @@ def get_dealerships(request):
 def get_dealer_details(request, id):
      if request.method == "GET":
          context = {}
-         dealer_url = "https://kevinraguett-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+         dealer_url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
          dealer = get_dealer_by_id_from_cf(dealer_url, id = id)
          context['dealer'] = dealer
 
-         review_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
+         review_url = "https://kevinraguett-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
          reviews = get_dealer_reviews_from_cf(review_url, id = id)
          context["reviews"] = reviews
-
+         if not context["reviews"] :
+            messages.warning("There are no reviews at the moment !!!")   
          return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
-@login_required(login_url='login/')
 def add_review(request, id):
     context = {}
-    dealer_url = "https://kevinraguett-3000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
+    dealer_url = "https://kevinraguett-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
     
     # Get dealer information
     dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
@@ -124,7 +124,6 @@ def add_review(request, id):
         return render(request, 'djangoapp/add_review.html', context)
     
     elif request.method == 'POST':
-        print("Vue atteinte. Utilisateur authentifié :", request.user.is_authenticated)
         if request.user.is_authenticated:
             username = request.user.username
             car_id = request.POST.get("car")
@@ -148,7 +147,7 @@ def add_review(request, id):
             
             # Prepare payload for the API request
             new_payload = {"review": payload}
-            review_post_url = "https://kevinraguett-5000.theiadocker-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
+            review_post_url = "https://kevinraguett-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
             
             # Make the POST request
             post_request(review_post_url, new_payload, id=id)
@@ -156,6 +155,5 @@ def add_review(request, id):
             return redirect("djangoapp:dealer_details", id=id)
         else:
             # Handle the case where the user is not authenticated
-            messages.error(request, "Please log in to add a review !!")
-            print("Redirection vers la page de connexion.")
-            return render(request, 'djangoapp/index.html', context)
+            messages.warning(request, "New review not added. Please log in to add a review !!")
+            return redirect('djangoapp:index')
