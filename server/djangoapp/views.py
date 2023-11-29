@@ -78,7 +78,7 @@ def registration_request(request):
             login(request, user)
             return render(request, 'djangoapp:index', context)
         else:
-            messages.warning("This user already exists !!!") 
+            messages.warning(request, "This user already exists !!!") 
             return render(request, 'djangoapp:registration', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
@@ -105,7 +105,7 @@ def get_dealer_details(request, id):
          reviews = get_dealer_reviews_from_cf(review_url, id = id)
          context["reviews"] = reviews
          if not context["reviews"] :
-            messages.warning("There are no reviews at the moment !!!")   
+            messages.warning(request, "There are no reviews at the moment !!!")   
          return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
